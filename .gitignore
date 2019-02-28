@@ -1,0 +1,14 @@
+
+# Ignore all data files (to protect privacy)
+*.csv
+*.xlsx
+*.db
+*.odt
+*.ods
+*.dbf
+
+# Ignore entire data folder
+data/*
+
+# This link has a list of all spreadsheet formats:
+# https://docs.microsoft.com/en-us/deployoffice/compat/office-file-format-reference
