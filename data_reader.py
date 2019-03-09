@@ -86,17 +86,29 @@ file_data = read_file_as_df(file_path)
 #print(file_data.head())	#print top portion of data
 #print(file_data.to_string())	# print all data
 
-# Create database
+# ***** Create database *****
 
+# Delete the old database, if it exists
+#os.remove('STEM_Center.db')
+
+# Read the database specification:
+#rf = open('STEM_Center_Sign_In_Tables.sql', 'r')	# Read database, if it already exists
+rf = open('STEM_Center_Sign_In_Tables.sql')	# Create a new database
+db_spec = rf.read()
+rf.close()
+
+# Make the database file and tables, using the specification
+conn = sqlite3.connect("STEM_Center.db")
+conn.executescript(db_spec)
 
 # Insert dataframe into a database
+file_data.to_sql('signins', con=conn)
 
-conn = sqlite3.connect("STEM_Center_Sign_In.sql")
-
-
+'''
 for i in range(len(file_data)):
 	rowVals = tuple(file_data.ix[i])
 	conn.execute("INSERT INTO signins VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", rowVals)
+'''
 
 '''
 for i in range(len(file_data)):
@@ -110,53 +122,15 @@ for i in range(len(file_data)):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Test by printing all data from database
+print ("\n\n\nQUERYING DATABASE\n\n\n")
+query = conn.execute("SELECT * FROM signins")
+for row in query:
+	print(row)
 
 
 
 conn.close()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -2,7 +2,7 @@
 -- David Lohmann
 -- This is a schema for a database to store all tutoring data
 
-CREATE TABLE signins (
+CREATE TABLE IF NOT EXISTS signins (
     Transaction_ID INTEGER PRIMARY KEY NOT NULL,
     Passed_Denied BOOLEAN,
     First_Name TEXT,	
