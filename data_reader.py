@@ -11,7 +11,7 @@ import sqlite3
 
 # Get file path
 cwd = os.getcwd()
-file_path = cwd + r'/data/stem_center_sign_in/STEM Center Consulti_20180921_1326_3419.csv'
+file_path = cwd + r'/data/stem_center_sign_in'
 
 
 # Takes in the name of a file, and returns the pandas dataframe containing that file's data
@@ -46,7 +46,7 @@ def read_file_as_df (file_name):
 	# ensure not to read extra rows after. Also subtract 1, to exclude the 1st row, the column names.
 	numRows = numRows - numToSkip - 1 
 	
-	file = pd.read_csv(file_path, skiprows=numToSkip, nrows=numRows)
+	file = pd.read_csv(file_name, skiprows=numToSkip, nrows=numRows)
 	df = pd.DataFrame(file)
 	
 	# Print file info:
@@ -76,20 +76,13 @@ def read_file_as_df (file_name):
 	
 	return df
 
-	
 
-file_data = read_file_as_df(file_path)
-
-
-
-# Print (for debugging)
-#print(file_data.head())	#print top portion of data
-#print(file_data.to_string())	# print all data
 
 # ***** Create database *****
 
 # Delete the old database, if it exists
-#os.remove('STEM_Center.db')
+if (os.path.exists('STEM_Center.db')):
+	os.remove('STEM_Center.db')
 
 # Read the database specification:
 #rf = open('STEM_Center_Sign_In_Tables.sql', 'r')	# Read database, if it already exists
@@ -99,23 +92,45 @@ rf.close()
 
 # Make the database file and tables, using the specification
 conn = sqlite3.connect("STEM_Center.db")
-conn.executescript(db_spec)
+#conn.executescript(db_spec)
 
-# Insert dataframe into a database
-file_data.to_sql('signins', con=conn)
+# For debugging (with only 1 file in list)
+file_list = ['STEM Center Consulti_20180921_1326_3419.csv']
 
-'''
-for i in range(len(file_data)):
-	rowVals = tuple(file_data.ix[i])
-	conn.execute("INSERT INTO signins VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", rowVals)
-'''
+for file_name in os.listdir(file_path):	#file_list:
+	
+	# ensure it is a CSV file
+	if (not(file_name.endswith(".csv"))):
+		continue	# Skip over files that are not csv files
+	
+	# Add file path to file name to get the path to read file from. Then read it as a pandas dataframe
+	file_path_and_name = file_path + "/" + file_name
+	print("Reading file: \"" + file_path_and_name + "\" into database")
+	file_data = read_file_as_df(file_path_and_name)
 
-'''
-for i in range(len(file_data)):
-	conn.execute( "INSERT INTO signin
-				+ "(Transaction_ID, Passed_Denied, First_Name, Last_Name, Email, CatCard_ID, Active) VALUES"
-				+ "();"
-'''
+
+
+	# Print (for debugging)
+	#print(file_data.head())	#print top portion of data
+	#print(file_data.to_string())	# print all data
+
+	
+
+	# Insert dataframe into a database
+	file_data.to_sql('signins', con=conn, if_exists='append')
+
+	'''
+	for i in range(len(file_data)):
+		rowVals = tuple(file_data.ix[i])
+		conn.execute("INSERT INTO signins VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", rowVals)
+	'''
+
+	'''
+	for i in range(len(file_data)):
+		conn.execute( "INSERT INTO signin
+					+ "(Transaction_ID, Passed_Denied, First_Name, Last_Name, Email, CatCard_ID, Active) VALUES"
+					+ "();"
+	'''
 
 
 
@@ -123,11 +138,12 @@ for i in range(len(file_data)):
 
 
 # Test by printing all data from database
+'''
 print ("\n\n\nQUERYING DATABASE\n\n\n")
-query = conn.execute("SELECT * FROM signins")
+query = conn.execute("SELECT * FROM signins;")
 for row in query:
 	print(row)
-
+'''
 
 
 conn.close()

@@ -2,21 +2,21 @@
 -- David Lohmann
 -- This is a schema for a database to store all tutoring data
 
-CREATE TABLE IF NOT EXISTS signins (
-    Transaction_ID INTEGER PRIMARY KEY NOT NULL,
-    Passed_Denied BOOLEAN,
-    First_Name TEXT,	
-    Last_Name TEXT,
-    Email TEXT,
-    CatCard_ID INTEGER,
-    Active INTEGER,
-    Affiliation TEXT,
-    Class TEXT,
-    Department TEXT,
-    Transaction_Date_Time TEXT,
-    Error_Info TEXT,
-    Comment_Note TEXT,
-    Semester TEXT
+CREATE TABLE IF NOT EXISTS `signins` (
+    `Transaction_ID` INTEGER PRIMARY KEY NOT NULL,
+    `Passed_Denied` BOOLEAN,
+    `First_Name` TEXT,
+    `Last_Name` TEXT,
+    `Email` TEXT,
+    `CatCard_ID` INTEGER,
+    `Active` INTEGER,
+    `Affiliation` TEXT,
+    `Class` TEXT,
+    `Department` TEXT,
+    `Transaction_Date_Time` TEXT,
+    `Error_Info` TEXT,
+    `Comment_Note` TEXT,
+    `Semester` TEXT
 );
 
 /*
@@ -47,6 +47,9 @@ INSERT INTO signins
     "Fall 2016"
 );
 */
+
+-- TODO: Add a trigger that removes duplicates (in case the same sign-in is entered multiple times due to an error)
+
 
 /*
 INSERT INTO signins (Transaction_ID,Passed_Denied,First_Name,	
