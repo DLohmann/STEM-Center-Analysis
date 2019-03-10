@@ -10,5 +10,8 @@
 # Ignore entire data folder
 data/*
 
+# Ignore the test queries (for privacy)
+test_queries.sql
+
 # This link has a list of all spreadsheet formats:
 # https://docs.microsoft.com/en-us/deployoffice/compat/office-file-format-reference
