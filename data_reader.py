@@ -90,13 +90,17 @@ rf = open('STEM_Center_Sign_In_Tables.sql')	# Create a new database
 db_spec = rf.read()
 rf.close()
 
-# Make the database file and tables, using the specification
+# Connect to database
 conn = sqlite3.connect("STEM_Center.db")
+
+# Make the database file and tables, using the specification
 #conn.executescript(db_spec)
 
 # For debugging (with only 1 file in list)
-file_list = ['STEM Center Consulti_20180921_1326_3419.csv']
+#file_list = ['STEM Center Consulti_20180921_1326_3419.csv']
 
+
+# ***** Add all STEM Center signins to database *****
 for file_name in os.listdir(file_path):	#file_list:
 	
 	# ensure it is a CSV file
@@ -105,7 +109,9 @@ for file_name in os.listdir(file_path):	#file_list:
 	
 	# Add file path to file name to get the path to read file from. Then read it as a pandas dataframe
 	file_path_and_name = file_path + "/" + file_name
+	
 	print("Reading file: \"" + file_path_and_name + "\" into database")
+	
 	file_data = read_file_as_df(file_path_and_name)
 
 
@@ -137,13 +143,17 @@ for file_name in os.listdir(file_path):	#file_list:
 
 
 
-# Test by printing all data from database
+# Test by printing all data from database table signins
 '''
 print ("\n\n\nQUERYING DATABASE\n\n\n")
 query = conn.execute("SELECT * FROM signins;")
 for row in query:
 	print(row)
 '''
+
+# TODO: Read Bio 1 data into database
+
+
 
 
 conn.close()
