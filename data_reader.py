@@ -39,7 +39,7 @@ def read_file_as_df (file_name):
 	# Now semester will be something like 'STEM Center Consulting-AOA 130-Fall 2016'
 	# So we want to split on the '-' character, and then get the last substring 'Fall 2016' 
 	semester = re.split(re.compile('-+'), semester)[-1]
-	
+	semester =  semester.strip()	# Gets rid of leading and trailing whitespace. Just a precaution. 
 	# Open csv, and read into pandas dataframe
 	# pandas read_csv applies the 'nrows' operation to calculate the last row to read, before applying the 'skiprows' 
 	# operation to skip them. So the 'nrows' still includes all rows that are skipped. So we have to take these out to 
@@ -162,5 +162,14 @@ for row in query:
 conn.close()
 
 #TODO: For some reason, there is a space in front of all semester names. But for some Fall 2016 entries, there is not. So there are 2 fall 2016 semesters: 'Fall 2016' and ' Fall 2016'. Must take this away.
+# This is because of the files
+# "STEM Center Consulti_20180921_1326_3419.csv" and
+# "STEM Center Tutoring_20180921_1327_3084.csv" have different entries in cell 2C.
+# The former has entry 
+# "STEM Center Consulting-AOA 130-Fall 2016" and the latter has entry
+# "STEM Center Tutoring - Fall 2016" so the splitter will get everything after the last "-"
+# Then leading and trailing whitespace is removed with the split() function.
+# So this used to cause 2 semesters for Fall 2016
+
 
 
