@@ -161,6 +161,6 @@ for row in query:
 
 conn.close()
 
-
+#TODO: For some reason, there is a space in front of all semester names. But for some Fall 2016 entries, there is not. So there are 2 fall 2016 semesters: 'Fall 2016' and ' Fall 2016'. Must take this away.
 
 
