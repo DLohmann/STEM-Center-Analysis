@@ -62,6 +62,7 @@ def read_file_as_df (file_name):
 	#newNames = {df.columns[i].replace(' ', '_').replace('/', '_') for i in range(len(df.columns))}
 	column_name_mapping = {df.columns[i] : df.columns[i].replace(' ', '_').replace('/', '_') for i in range(len(df.columns))}	# create a dictionary mapping old column names to new column names
 	df = df.rename(index=str, columns=column_name_mapping)	# Rename old column names to new column names (same name, but all special characters are replaced with "_")
+	# The rename function made both the rows and columns accessed by string (ie file_data.loc['0']['Transaction_ID']), but we can always use the iloc function to access by index now (ie file_data.iloc[0][0])
 	
 	# Drop NaN values, and replace them with the empty string
 	df = df.fillna('')
@@ -74,6 +75,8 @@ def read_file_as_df (file_name):
 	
 	# TODO: Save as excel file to processed data folder
 	
+	# TODO: Delete index column, so that it will not be inserted into database later
+	
 	return df
 
 
@@ -81,8 +84,8 @@ def read_file_as_df (file_name):
 # ***** Create database *****
 
 # Delete the old database, if it exists
-if (os.path.exists('STEM_Center.db')):
-	os.remove('STEM_Center.db')
+#if (os.path.exists('STEM_Center.db')):
+#	os.remove('STEM_Center.db')
 
 # Read the database specification:
 #rf = open('STEM_Center_Sign_In_Tables.sql', 'r')	# Read database, if it already exists
