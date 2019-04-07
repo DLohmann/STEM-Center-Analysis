@@ -90,12 +90,11 @@ def read_bio1_roster_as_df(file_name_and_path, semester):
 	roster_data = roster_data["Student"].str.split(", ", n=1, expand=True)
 	
 	# Rename the columns
-	
 	column_name_mapping = {0:"Last_Name", 1:"First_Name"}	# create a dictionary mapping old column names to new column names
 	roster_data = roster_data.rename(index=str, columns=column_name_mapping)	# Rename old column names to new column names (same name, but all special characters are replaced with "_")
 	
-	# TODO: make a column for the First_Name and Last_Name
-	
+	# Get the semester, and add a semester column
+	roster_data["Semester"] = semester
 	
 	return roster_data
 
@@ -132,12 +131,12 @@ for semester_file in survey_files:
 
 
 # ***** ADD ALL ROSTER DATA *****
-file_path = r'data/Bio1_Roster'
+file_path = r'data/Bio1_Roster/'
 roster_files = [[r'Bio 001 Fall 2017-Roster.xlsx', r'Fall 2017'], [r'Bio 001 Spring 2018-Roster.xlsx', r'Spring 2018']]
 
 for semester_file in roster_files:
 	roster_data = read_bio1_roster_as_df( (file_path + semester_file[0]), semester = semester_file[1])
-	print(roster_data)
+	#print(roster_data)
 	
 	
 	# write to database
