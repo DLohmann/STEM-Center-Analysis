@@ -113,7 +113,7 @@ for file_name in os.listdir(file_path):	#file_list:
 	# Add file path to file name to get the path to read file from. Then read it as a pandas dataframe
 	file_path_and_name = file_path + "/" + file_name
 	
-	print("Reading file: \"" + file_path_and_name + "\" into database")
+	print("Reading file: \"" + file_path_and_name + "\" into database\n\n\n")
 	
 	file_data = read_file_as_df(file_path_and_name)
 
@@ -167,8 +167,8 @@ conn.close()
 # "STEM Center Tutoring_20180921_1327_3084.csv" have different entries in cell 2C.
 # The former has entry 
 # "STEM Center Consulting-AOA 130-Fall 2016" and the latter has entry
-# "STEM Center Tutoring - Fall 2016" so the splitter will get everything after the last "-"
-# Then leading and trailing whitespace is removed with the split() function.
+# "STEM Center Tutoring - Fall 2016" so the stripper will get everything after the last "-"
+# Then leading and trailing whitespace is removed with the strip() function.
 # So this used to cause 2 semesters for Fall 2016
 
 
