@@ -5,9 +5,12 @@
 -- ***** Fall 2017: *****
 -- Report total # of students enrolled in the class – Dr. Beaster-Jones will provide class rosters for each semester
 -- There are 516 students on the Bio 1 course roster.
+SELECT COUNT(*)
+FROM bio1roster;
+
 
 SELECT COUNT(*)
-FROM bio1
+FROM bio1survey
 WHERE Semester = "Fall 2017";
 -- Returns 464, so the survey was completed 464 times
 
@@ -17,13 +20,13 @@ WHERE Semester = "Fall 2017";
 
 
 SELECT DISTINCT name
-FROM bio1
+FROM bio1survey
 WHERE Semester = "Fall 2017"
 ORDER BY name;
 -- Returns 459 names. So only 459 students took the survey, but 5 students took it twice lol (unless there are 2 people in the class with the exact same name).
 
 SELECT name
-FROM bio1
+FROM bio1survey
 WHERE Semester = "Fall 2017"
 ORDER BY name;
 -- Returns 464 names
@@ -31,10 +34,10 @@ ORDER BY name;
 -- Find all students with same name
 
 SELECT name
-FROM bio1
+FROM bio1survey
 WHERE Semester = "Fall 2017" AND name NOT IN(
     SELECT DISTINCT name
-    FROM bio1
+    FROM bio1survey
     WHERE Semester = "Fall 2017"
 );
 -- Returns 411 with distinct, 418 without distinct
@@ -43,18 +46,17 @@ WHERE Semester = "Fall 2017" AND name NOT IN(
 
 
 -- Five students took the survey twice???
-CREATE View survey_count AS
 SELECT name, COUNT(name) AS numOccurences 
-FROM bio1
+FROM bio1survey
 WHERE Semester = "Fall 2017"
 GROUP BY name
+HAVING numOccurences > 1
 ORDER BY numOccurences DESC;
 
-SELECT * FROM survey_count;
 
 SELECT survey_count.name, survey_count.numOccurrences
-FROM survey_count, bio1
-WHERE survey_count.name = bio1.name AND survey_count.numOccurences > 1;
+FROM survey_count, bio1survey
+WHERE survey_count.name = bio1survey.name AND survey_count.numOccurences > 1;
 
 
 -- 5 students have the same name???
@@ -94,7 +96,7 @@ WHERE survey_count.name = bio1.name AND survey_count.numOccurences > 1;
 
 -- Find students who were in both semesters of bio 1:
 SELECT *
-FROM bio1 F17, bio1 S18
+FROM bio1survey F17, bio1survey S18
 WHERE F17.Semester = "Fall 2017" AND S18.Semester = "Spring 2018" AND F17.name = S18.name
 ORDER BY F17.name;
 -- There were 18 students in both semesters
@@ -111,31 +113,79 @@ ORDER BY COUNT(*) DESC;
 
 -- Find counts of all people who have ever taken bio 1 in the semesters, and have ever signed into the STEM Center
 SELECT DISTINCT name, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
-FROM signins, bio1
-WHERE (signins.First_Name || " " || signins.Last_Name) = bio1.name
-GROUP BY bio1.name
+FROM signins, bio1survey
+WHERE (signins.First_Name || " " || signins.Last_Name) = bio1survey.name
+GROUP BY bio1survey.name
 ORDER BY numSignIns DESC;
 
--- Find counts of all people who have ever taken bio 1 in the semesters, and actually signed in DURING THE SEMESTER THEY TOOK bio1
-SELECT DISTINCT name, bio1.Semester, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
-FROM signins, bio1
-WHERE (signins.First_Name || " " || signins.Last_Name) = bio1.name AND signins.Semester = bio1.Semester
-GROUP BY bio1.name
-ORDER BY bio1.Semester, numSignIns DESC;
+-- Find counts of all people who have ever taken bio 1 in the semesters, and actually signed in DURING THE SEMESTER THEY TOOK bio1survey
+SELECT DISTINCT name, bio1survey.Semester, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
+FROM signins, bio1survey
+WHERE (signins.First_Name || " " || signins.Last_Name) = bio1survey.name AND signins.Semester = bio1survey.Semester
+GROUP BY bio1survey.name
+ORDER BY bio1survey.Semester, numSignIns DESC;
 
 
 SELECT COUNT(*)
-FROM bio1
+FROM bio1survey
 WHERE STEM_Resource_Center_study_groups = 1;
 
 SELECT COUNT(DISTINCT name)
-FROM bio1;
+FROM bio1survey;
 
 
--- TODO: Find all bio 1 students who signed in, but did not say they used the STEM Resource center study groups
+-- TODO: Find all bio 1 students who signed in during the semester they took bio 1, but did not say they participated in the STEM Resource center study groups learning assistant led activities
+SELECT bio1survey.name, COUNT(signins.Transaction_ID) AS numSignIns, signins.Semester
+FROM bio1survey, signins
+WHERE bio1survey.name = signins.First_Name || " " || signins.Last_Name AND bio1survey.STEM_Resource_Center_study_groups = 0 AND signins.Semester = bio1survey.Semester
+GROUP BY bio1survey.name
+ORDER BY signins.Semester, numSignIns DESC, bio1survey.name;
+
+
 -- TODO: Find all bio 1 students who said they used the STEM resource center study groups, but did not sign in
+SELECT bio1survey.name, bio1survey.Semester
+FROM bio1survey
+WHERE bio1survey.STEM_Resource_Center_study_groups = 1 AND bio1survey.name NOT IN (
+    SELECT (signins.First_Name || " " || signins.Last_Name) AS name
+    FROM signins
+)
+GROUP BY bio1survey.name
+ORDER BY bio1survey.Semester, bio1survey.name;
+
+
+/*
+-- An example of a student who said he participated in STEM resource center study groups, but did not sign in
+SELECT *
+FROM signins
+WHERE (signins.First_Name || " " || signins.Last_Name) = "Bryan Lopez Herrera";
+SELECT *
+FROM bio1survey
+WHERE name = "Bryan Lopez Herrera";
+*/
+
 -- TODO: Find all bio 1 students who both said they used the STEM resource center study groups and signed in
--- TODO: Read the bio 1 rosters into the database (not just the bio 1 survey responses)
+
+
 -- TODO: Find all students who are on the roster, but did not take the survey
--- TODO: Make a Venn diagam indicating the overlap between the bio 1 roster, the bio1 survey data, and the stem center signins. This will show how many students are in each group individually, and in both groups. Do this for both bio 1 semesters.
+SELECT *
+FROM bio1roster
+WHERE Semester = "Fall 2017" AND (bio1roster.First_Name || " " || bio1roster.Last_Name) NOT IN (
+    SELECT name
+    FROM bio1survey
+    WHERE Semester = "Fall 2017"
+)
+ORDER BY Semester, Last_Name, First_Name;
+
+-- Check for duplicates in data
+SELECT COUNT(*)
+FROM bio1roster
+WHERE bio1roster."index" = 1;
+
+SELECT bio1roster."index", COUNT(bio1roster."index") AS numDuplicates
+FROM bio1roster
+GROUP BY bio1roster."index"
+HAVING numDuplicates > 1
+ORDER BY numDuplicates, bio1roster."index";
+
+-- TODO: Make a Venn diagam indicating the overlap between the bio 1 roster, the bio1survey survey data, and the stem center signins. This will show how many students are in each group individually, and in both groups. Do this for both bio 1 semesters.
 -- TODO: Finish report and email to Petia. After Petia reviews it and you make the corrections, schedule an in-person meeting with Petia. Then email it to Beaster-Jones.
