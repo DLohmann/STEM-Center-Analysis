@@ -6,6 +6,7 @@
 *.odt
 *.ods
 *.dbf
+*.ott
 
 # Ignore entire data folder
 data/*
@@ -15,3 +16,14 @@ test_queries.sql
 
 # This link has a list of all spreadsheet formats:
 # https://docs.microsoft.com/en-us/deployoffice/compat/office-file-format-reference
+
+# Ignore reports and charts summarizing data
+*.docx
+*.doc
+*.pdf
+
+# Ignore images (which might go into report)
+*.png
+
+# Ignore visual studio code settings
+.vscode/*

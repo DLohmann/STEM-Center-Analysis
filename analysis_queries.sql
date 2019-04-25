@@ -78,6 +78,23 @@ WHERE survey_count.name = bio1survey.name AND survey_count.numOccurences > 1;
 -- Same as above for students with 1-4 visits per semester
 
  
+-- Make table of name vs number of visits vs survey answers
+SELECT DISTINCT name, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns, STEM_Resource_Center_study_groups, Exam_Reviews_led_by_BIO_001_TAs, PALS_weekly_study_groups, Exam_Reviews_led_by_PALS
+FROM signins, bio1survey
+WHERE (signins.First_Name || " " || signins.Last_Name) = bio1survey.name AND bio1survey.Semester = "Fall 2017"
+GROUP BY bio1survey.name
+ORDER BY numSignIns DESC;
+
+SELECT DISTINCT name, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns, STEM_Resource_Center_study_groups, Exam_Reviews_led_by_BIO_001_TAs, PALS_weekly_study_groups, Exam_Reviews_led_by_PALS
+FROM signins, bio1survey
+WHERE (signins.First_Name || " " || signins.Last_Name) = bio1survey.name AND bio1survey.Semester = "Spring 2018"
+GROUP BY bio1survey.name
+ORDER BY numSignIns DESC;
+
+-- Count the amount of students in survey doing each activity
+SELECT SUM(STEM_Resource_Center_study_groups), SUM(Exam_Reviews_led_by_BIO_001_TAs), SUM(PALS_weekly_study_groups), SUM(Exam_Reviews_led_by_PALS)
+FROM bio1survey;
+
 -- ***** Spring 2018: *****
 -- Report total # of students enrolled in the class – Dr. Beaster-Jones will provide class rosters for each semester
 
@@ -163,10 +180,14 @@ FROM bio1survey
 WHERE name = "Bryan Lopez Herrera";
 */
 
--- TODO: Find all bio 1 students who both said they used the STEM resource center study groups and signed in
+-- Find all bio 1 students who both said they used the STEM resource center study groups and signed in DURING THE SEMESTER THEY TOOK BIO 1
+SELECT bio1survey.name, COUNT(signins.Transaction_ID) AS numSignIns, signins.Semester
+FROM bio1survey, signins
+WHERE bio1survey.name = signins.First_Name || " " || signins.Last_Name AND bio1survey.STEM_Resource_Center_study_groups = 1 AND signins.Semester = bio1survey.Semester
+GROUP BY bio1survey.name
+ORDER BY signins.Semester, numSignIns DESC, bio1survey.name;
 
-
--- TODO: Find all students who are on the roster, but did not take the survey
+-- Find all students who are on the roster, but did not take the survey
 SELECT *
 FROM bio1roster
 WHERE Semester = "Fall 2017" AND (bio1roster.First_Name || " " || bio1roster.Last_Name) NOT IN (
@@ -176,16 +197,10 @@ WHERE Semester = "Fall 2017" AND (bio1roster.First_Name || " " || bio1roster.Las
 )
 ORDER BY Semester, Last_Name, First_Name;
 
--- Check for duplicates in data
-SELECT COUNT(*)
-FROM bio1roster
-WHERE bio1roster."index" = 1;
 
-SELECT bio1roster."index", COUNT(bio1roster."index") AS numDuplicates
-FROM bio1roster
-GROUP BY bio1roster."index"
-HAVING numDuplicates > 1
-ORDER BY numDuplicates, bio1roster."index";
+
 
 -- TODO: Make a Venn diagam indicating the overlap between the bio 1 roster, the bio1survey survey data, and the stem center signins. This will show how many students are in each group individually, and in both groups. Do this for both bio 1 semesters.
+
+
 -- TODO: Finish report and email to Petia. After Petia reviews it and you make the corrections, schedule an in-person meeting with Petia. Then email it to Beaster-Jones.
