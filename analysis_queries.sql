@@ -54,10 +54,6 @@ HAVING numOccurences > 1
 ORDER BY numOccurences DESC;
 
 
-SELECT survey_count.name, survey_count.numOccurrences
-FROM survey_count, bio1survey
-WHERE survey_count.name = bio1survey.name AND survey_count.numOccurences > 1;
-
 
 -- 5 students have the same name???
 
@@ -66,11 +62,33 @@ WHERE survey_count.name = bio1survey.name AND survey_count.numOccurences > 1;
 
 
 
-
+-- Table 5: Fall 2017 bio 1 roster students who signed in more than 8 times
 -- Provide the list of students who used the STEM Center more than 8 times per semester + indicate specific number of visits for each students
--- For all students 
+SELECT bio1roster.First_Name, bio1roster.Last_Name, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
+FROM signins, bio1roster
+WHERE (signins.First_Name || " " || signins.Last_Name) = (bio1roster.First_Name || " " || bio1roster.Last_Name) AND bio1roster.Semester = "Fall 2017"
+GROUP BY (bio1roster.First_Name || " " || bio1roster.Last_Name)
+HAVING numSignIns > 8
+ORDER BY numSignIns DESC;
 
+-- Same thing but using names from survey instead of from roster
+/*
+SELECT name, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
+FROM signins, bio1survey
+WHERE (signins.First_Name || " " || signins.Last_Name) = bio1survey.name AND bio1survey.Semester = "Fall 2017"
+GROUP BY bio1survey.name
+HAVING numSignIns > 8
+ORDER BY numSignIns DESC;
+*/
 
+-- Table 6: Spring 2018 bio 1 roster students who signed in more than 8 times
+-- Provide the list of students who used the STEM Center more than 8 times per semester + indicate specific number of visits for each students
+SELECT bio1roster.First_Name, bio1roster.Last_Name, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
+FROM signins, bio1roster
+WHERE (signins.First_Name || " " || signins.Last_Name) = (bio1roster.First_Name || " " || bio1roster.Last_Name) AND bio1roster.Semester = "Spring 2018"
+GROUP BY (bio1roster.First_Name || " " || bio1roster.Last_Name)
+HAVING numSignIns > 8
+ORDER BY numSignIns DESC;
 
 
 -- Provide the list of students who used the STEM Center 5-8 times per semester+ indicate specific number of visits for each students
@@ -78,6 +96,7 @@ WHERE survey_count.name = bio1survey.name AND survey_count.numOccurences > 1;
 -- Same as above for students with 1-4 visits per semester
 
  
+-- Table 1: Fall 2017 Bio 1 STEM Center Signins And Survey Results.csv (this query was used to create this table in the report)
 -- Make table of name vs number of visits vs survey answers
 SELECT DISTINCT name, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns, STEM_Resource_Center_study_groups, Exam_Reviews_led_by_BIO_001_TAs, PALS_weekly_study_groups, Exam_Reviews_led_by_PALS
 FROM signins, bio1survey
@@ -85,15 +104,23 @@ WHERE (signins.First_Name || " " || signins.Last_Name) = bio1survey.name AND bio
 GROUP BY bio1survey.name
 ORDER BY numSignIns DESC;
 
+-- Table 2: Spring 2018 Bio 1 STEM Center Signins And Survey Results.csv (this query was used to create this table in the report)
 SELECT DISTINCT name, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns, STEM_Resource_Center_study_groups, Exam_Reviews_led_by_BIO_001_TAs, PALS_weekly_study_groups, Exam_Reviews_led_by_PALS
 FROM signins, bio1survey
 WHERE (signins.First_Name || " " || signins.Last_Name) = bio1survey.name AND bio1survey.Semester = "Spring 2018"
 GROUP BY bio1survey.name
 ORDER BY numSignIns DESC;
 
+-- Table 3: Fall 2017 Bio 1 Survey Activity Sum.csv (this query was used to create this table in the report)
 -- Count the amount of students in survey doing each activity
 SELECT SUM(STEM_Resource_Center_study_groups), SUM(Exam_Reviews_led_by_BIO_001_TAs), SUM(PALS_weekly_study_groups), SUM(Exam_Reviews_led_by_PALS)
-FROM bio1survey;
+FROM bio1survey
+WHERE Semester = "Fall 2017";
+
+-- Table 4: Spring 2018 Bio 1 Survey Activity Sum.csv (this query was used to create this table in the report)
+SELECT SUM(STEM_Resource_Center_study_groups), SUM(Exam_Reviews_led_by_BIO_001_TAs), SUM(PALS_weekly_study_groups), SUM(Exam_Reviews_led_by_PALS)
+FROM bio1survey
+WHERE Semester = "Spring 2018";
 
 -- ***** Spring 2018: *****
 -- Report total # of students enrolled in the class – Dr. Beaster-Jones will provide class rosters for each semester
@@ -204,3 +231,6 @@ ORDER BY Semester, Last_Name, First_Name;
 
 
 -- TODO: Finish report and email to Petia. After Petia reviews it and you make the corrections, schedule an in-person meeting with Petia. Then email it to Beaster-Jones.
+
+
+
