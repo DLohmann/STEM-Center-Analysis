@@ -2,11 +2,22 @@
 -- This task is performed for Fall 2017 and Spring 2018 – so, two completely different data set analysis
 
 
+
+
+
+
+
+
+
 -- ***** Fall 2017: *****
 -- Report total # of students enrolled in the class – Dr. Beaster-Jones will provide class rosters for each semester
--- There are 516 students on the Bio 1 course roster.
+-- There are 517 students on the Bio 1 course roster.
 SELECT COUNT(*)
 FROM bio1roster;
+
+
+
+
 
 
 SELECT COUNT(*)
@@ -14,14 +25,64 @@ FROM bio1survey
 WHERE Semester = "Fall 2017";
 -- Returns 464, so the survey was completed 464 times
 
+-- Fall 2017 Data Summary
+-- Entries on survey
+SELECT COUNT(*)
+FROM bio1survey
+WHERE Semester = "Fall 2017";    -- 464
+-- Entries on roster
+SELECT COUNT(*)
+FROM bio1roster
+WHERE Semester = "Fall 2017";    -- 517
+-- Duplicates on survey
+SELECT COUNT(*)
+FROM (
+    SELECT 1
+    FROM bio1survey
+    WHERE Semester = "Fall 2017"
+    GROUP BY name
+    HAVING COUNT(name) > 1
+);    -- 5
+-- Duplicates on roster
+SELECT COUNT(*)
+FROM (
+    SELECT 1
+    FROM bio1roster
+    WHERE Semester = "Fall 2017"
+    GROUP BY First_Name || " " || Last_Name
+    HAVING COUNT(First_Name || " " || Last_Name) > 1
+);    -- 1
 
 
 
 
-
-
-
-
+-- Spring 2018 Data Summary
+-- Entries on survey
+SELECT COUNT(*)
+FROM bio1survey
+WHERE Semester = "Spring 2018";    -- 436
+-- Entries on roster
+SELECT COUNT(*)
+FROM bio1roster
+WHERE Semester = "Spring 2018";    -- 485
+-- Duplicates on survey
+SELECT COUNT(*)
+FROM (
+    SELECT 1
+    FROM bio1survey
+    WHERE Semester = "Spring 2018"
+    GROUP BY name
+    HAVING COUNT(name) > 1
+);    -- 7
+-- Duplicates on roster
+SELECT COUNT(*)
+FROM (
+    SELECT 1
+    FROM bio1roster
+    WHERE Semester = "Spring 2018"
+    GROUP BY First_Name || " " || Last_Name
+    HAVING COUNT(First_Name || " " || Last_Name) > 1
+);    -- 2
 
 
 SELECT DISTINCT name
@@ -197,7 +258,78 @@ ORDER BY numOccurences DESC;
 
 
 -- Table 17: Fall 2017 Histogram count of signins
+-- This article was useful in making the histograms: https://www.dotnettricks.com/learn/sqlserver/different-types-of-sql-joins
+
+SELECT numSignIns, COUNT(*)
+FROM (
+    SELECT bio1roster.First_Name, bio1roster.Last_Name, bio1roster.Semester, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
+    FROM bio1roster LEFT OUTER JOIN signins ON ( signins.First_Name = bio1roster.First_Name AND  signins.Last_Name = bio1roster.Last_Name AND signins.Semester = bio1roster.Semester )
+    WHERE bio1roster.Semester = "Fall 2017"
+    GROUP BY (bio1roster.First_Name || " " || bio1roster.Last_Name)
+    ORDER BY numSignIns DESC
+)
+GROUP BY numSignIns
+ORDER BY numSignIns ASC;
+
+-- Table 18: Spring 2018 Histogram count of signins
 -- This article was useful in making the histograms
+
+SELECT numSignIns, COUNT(*)
+FROM (
+    SELECT bio1roster.First_Name, bio1roster.Last_Name, bio1roster.Semester, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
+    FROM bio1roster LEFT OUTER JOIN signins ON ( signins.First_Name = bio1roster.First_Name AND  signins.Last_Name = bio1roster.Last_Name AND signins.Semester = bio1roster.Semester )
+    WHERE bio1roster.Semester = "Spring 2018"
+    GROUP BY (bio1roster.First_Name || " " || bio1roster.Last_Name)
+    ORDER BY numSignIns DESC
+)
+GROUP BY numSignIns
+ORDER BY numSignIns ASC;
+
+-- Table 19: Fall 2017 STEM Center Study Survey Response Vs Total Signins
+SELECT STEM_Resource_Center_study_groups, SUM(numSignIns)
+FROM (
+    SELECT bio1survey.name, bio1survey.STEM_Resource_Center_study_groups, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
+    FROM bio1survey LEFT OUTER JOIN signins ON ( signins.First_Name || " " || signins.Last_Name = bio1survey.name AND signins.Semester = bio1survey.Semester )
+    WHERE bio1survey.Semester = "Fall 2017"
+    GROUP BY bio1survey.name
+    ORDER BY bio1survey.STEM_Resource_Center_study_groups ASC, numSignIns ASC
+)
+GROUP BY STEM_Resource_Center_study_groups;
+
+-- Table 20: Spring 2018 STEM Center Study Survey Response Vs Total Signins
+SELECT STEM_Resource_Center_study_groups, SUM(numSignIns)
+FROM (
+    SELECT bio1survey.name, bio1survey.STEM_Resource_Center_study_groups, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
+    FROM bio1survey LEFT OUTER JOIN signins ON ( signins.First_Name || " " || signins.Last_Name = bio1survey.name AND signins.Semester = bio1survey.Semester )
+    WHERE bio1survey.Semester = "Spring 2018"
+    GROUP BY bio1survey.name
+    ORDER BY bio1survey.STEM_Resource_Center_study_groups ASC, numSignIns ASC
+)
+GROUP BY STEM_Resource_Center_study_groups;
+
+-- Table 21: Fall 2017 STEM Center Study Survey Response Vs Average Signins
+SELECT STEM_Resource_Center_study_groups, AVG(numSignIns)
+FROM (
+    SELECT bio1survey.name, bio1survey.STEM_Resource_Center_study_groups, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
+    FROM bio1survey LEFT OUTER JOIN signins ON ( signins.First_Name || " " || signins.Last_Name = bio1survey.name AND signins.Semester = bio1survey.Semester )
+    WHERE bio1survey.Semester = "Fall 2017"
+    GROUP BY bio1survey.name
+    ORDER BY bio1survey.STEM_Resource_Center_study_groups ASC, numSignIns ASC
+)
+GROUP BY STEM_Resource_Center_study_groups;
+
+
+-- Table 22: Spring 2018 STEM Center Study Survey Response Vs Average Signins
+SELECT STEM_Resource_Center_study_groups, AVG(numSignIns)
+FROM (
+    SELECT bio1survey.name, bio1survey.STEM_Resource_Center_study_groups, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
+    FROM bio1survey LEFT OUTER JOIN signins ON ( signins.First_Name || " " || signins.Last_Name = bio1survey.name AND signins.Semester = bio1survey.Semester )
+    WHERE bio1survey.Semester = "Spring 2018"
+    GROUP BY bio1survey.name
+    ORDER BY bio1survey.STEM_Resource_Center_study_groups ASC, numSignIns ASC
+)
+GROUP BY STEM_Resource_Center_study_groups;
+
 
 SELECT bio1roster.First_Name, bio1roster.Last_Name, bio1roster.Semester, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
 FROM bio1roster LEFT OUTER JOIN signins ON ( signins.First_Name = bio1roster.First_Name AND  signins.Last_Name = bio1roster.Last_Name AND signins.Semester = bio1roster.Semester )
@@ -205,11 +337,22 @@ WHERE bio1roster.Semester = "Fall 2017"
 GROUP BY (bio1roster.First_Name || " " || bio1roster.Last_Name)
 ORDER BY numSignIns DESC;
 
+
+SELECT bio1survey.name, bio1survey.STEM_Resource_Center_study_groups, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
+FROM bio1survey LEFT OUTER JOIN signins ON ( signins.First_Name || " " || signins.Last_Name = bio1survey.name AND signins.Semester = bio1survey.Semester )
+WHERE bio1survey.Semester = "Fall 2017"
+GROUP BY bio1survey.name
+ORDER BY bio1survey.STEM_Resource_Center_study_groups ASC, numSignIns ASC;
+
+
+
+
+/*
 SELECT DISTINCT (bio1roster.First_Name || " " || bio1roster.Last_Name) AS name, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
 FROM bio1roster LEFT OUTER JOIN signins ON ( (signins.First_Name || " " || signins.Last_Name) = (bio1roster.First_Name || " " || bio1roster.Last_Name) AND signins.Semester = bio1roster.Semester AND bio1roster.Semester = "Fall 2017" )
 GROUP BY name
 ORDER BY numSignins DESC;
-
+*/
 SELECT COUNT(*)
 FROM bio1roster LEFT OUTER JOIN signins ON ( (signins.First_Name || " " || signins.Last_Name) = (bio1roster.First_Name || " " || bio1roster.Last_Name) AND signins.Semester = bio1roster.Semester AND bio1roster.Semester = "Fall 2017" );
 
@@ -223,6 +366,10 @@ WHERE Semester = "Fall 2017";
 
 SELECT COUNT(*)
 FROM signins;
+
+SELECT COUNT(DISTINCT name)
+FROM bio1survey
+WHERE Semester = "Fall 2017";
 
 SELECT numSignIns, COUNT(*)
 FROM (
