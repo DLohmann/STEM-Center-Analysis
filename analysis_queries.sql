@@ -19,6 +19,11 @@ WHERE Semester = "Fall 2017";
 
 
 
+
+
+
+
+
 SELECT DISTINCT name
 FROM bio1survey
 WHERE Semester = "Fall 2017"
@@ -45,57 +50,8 @@ WHERE Semester = "Fall 2017" AND name NOT IN(
 
 
 
--- Five students took the survey twice???
-SELECT name, COUNT(name) AS numOccurences 
-FROM bio1survey
-WHERE Semester = "Fall 2017"
-GROUP BY name
-HAVING numOccurences > 1
-ORDER BY numOccurences DESC;
-
-
-
 -- 5 students have the same name???
 
-
--- Report total # of students who used the peer-tutors’ help
-
-
-
--- Table 5: Fall 2017 bio 1 roster students who signed in more than 8 times
--- Provide the list of students who used the STEM Center more than 8 times per semester + indicate specific number of visits for each students
-SELECT bio1roster.First_Name, bio1roster.Last_Name, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
-FROM signins, bio1roster
-WHERE (signins.First_Name || " " || signins.Last_Name) = (bio1roster.First_Name || " " || bio1roster.Last_Name) AND bio1roster.Semester = "Fall 2017"
-GROUP BY (bio1roster.First_Name || " " || bio1roster.Last_Name)
-HAVING numSignIns > 8
-ORDER BY numSignIns DESC;
-
--- Same thing but using names from survey instead of from roster
-/*
-SELECT name, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
-FROM signins, bio1survey
-WHERE (signins.First_Name || " " || signins.Last_Name) = bio1survey.name AND bio1survey.Semester = "Fall 2017"
-GROUP BY bio1survey.name
-HAVING numSignIns > 8
-ORDER BY numSignIns DESC;
-*/
-
--- Table 6: Spring 2018 bio 1 roster students who signed in more than 8 times
--- Provide the list of students who used the STEM Center more than 8 times per semester + indicate specific number of visits for each students
-SELECT bio1roster.First_Name, bio1roster.Last_Name, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
-FROM signins, bio1roster
-WHERE (signins.First_Name || " " || signins.Last_Name) = (bio1roster.First_Name || " " || bio1roster.Last_Name) AND bio1roster.Semester = "Spring 2018"
-GROUP BY (bio1roster.First_Name || " " || bio1roster.Last_Name)
-HAVING numSignIns > 8
-ORDER BY numSignIns DESC;
-
-
--- Provide the list of students who used the STEM Center 5-8 times per semester+ indicate specific number of visits for each students
-
--- Same as above for students with 1-4 visits per semester
-
- 
 -- Table 1: Fall 2017 Bio 1 STEM Center Signins And Survey Results.csv (this query was used to create this table in the report)
 -- Make table of name vs number of visits vs survey answers
 SELECT DISTINCT name, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns, STEM_Resource_Center_study_groups, Exam_Reviews_led_by_BIO_001_TAs, PALS_weekly_study_groups, Exam_Reviews_led_by_PALS
@@ -122,20 +78,175 @@ SELECT SUM(STEM_Resource_Center_study_groups), SUM(Exam_Reviews_led_by_BIO_001_T
 FROM bio1survey
 WHERE Semester = "Spring 2018";
 
--- ***** Spring 2018: *****
--- Report total # of students enrolled in the class – Dr. Beaster-Jones will provide class rosters for each semester
-
--- Report total # of students who used the peer-tutors’ help – Petia will provide list of STEM Center attendees
-
+-- Table 5: Fall 2017 bio 1 roster students who signed in more than 8 times
 -- Provide the list of students who used the STEM Center more than 8 times per semester + indicate specific number of visits for each students
+SELECT bio1roster.First_Name, bio1roster.Last_Name, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
+FROM signins, bio1roster
+WHERE (signins.First_Name || " " || signins.Last_Name) = (bio1roster.First_Name || " " || bio1roster.Last_Name) AND signins.Semester = bio1roster.Semester AND bio1roster.Semester = "Fall 2017"
+GROUP BY (bio1roster.First_Name || " " || bio1roster.Last_Name)
+HAVING numSignIns > 8
+ORDER BY numSignIns DESC;
 
+-- Same thing but using names from survey instead of from roster
+/*
+SELECT name, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
+FROM signins, bio1survey
+WHERE (signins.First_Name || " " || signins.Last_Name) = bio1survey.name AND bio1survey.Semester = "Fall 2017"
+GROUP BY bio1survey.name
+HAVING numSignIns > 8
+ORDER BY numSignIns DESC;
+*/
+
+-- Table 6: Spring 2018 bio 1 roster students who signed in more than 8 times
+-- Provide the list of students who used the STEM Center more than 8 times per semester + indicate specific number of visits for each students
+SELECT bio1roster.First_Name, bio1roster.Last_Name, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
+FROM signins, bio1roster
+WHERE (signins.First_Name || " " || signins.Last_Name) = (bio1roster.First_Name || " " || bio1roster.Last_Name) AND signins.Semester = bio1roster.Semester AND bio1roster.Semester = "Spring 2018"
+GROUP BY (bio1roster.First_Name || " " || bio1roster.Last_Name)
+HAVING numSignIns > 8
+ORDER BY numSignIns DESC;
+
+-- Table 7: Fall 2017 bio 1 roster students who signed in 5-8 times
 -- Provide the list of students who used the STEM Center 5-8 times per semester+ indicate specific number of visits for each students
+SELECT bio1roster.First_Name, bio1roster.Last_Name, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
+FROM signins, bio1roster
+WHERE (signins.First_Name || " " || signins.Last_Name) = (bio1roster.First_Name || " " || bio1roster.Last_Name) AND signins.Semester = bio1roster.Semester AND bio1roster.Semester = "Fall 2017"
+GROUP BY (bio1roster.First_Name || " " || bio1roster.Last_Name)
+HAVING numSignIns >= 5 AND numSignIns <= 8
+ORDER BY numSignIns DESC;
 
+-- Table 8: Spring 2018 bio 1 roster students who signed in 5-8 times
+-- Provide the list of students who used the STEM Center 5-8 times per semester+ indicate specific number of visits for each students
+SELECT bio1roster.First_Name, bio1roster.Last_Name, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
+FROM signins, bio1roster
+WHERE (signins.First_Name || " " || signins.Last_Name) = (bio1roster.First_Name || " " || bio1roster.Last_Name) AND signins.Semester = bio1roster.Semester AND bio1roster.Semester = "Spring 2018"
+GROUP BY (bio1roster.First_Name || " " || bio1roster.Last_Name)
+HAVING numSignIns >= 5 AND numSignIns <= 8
+ORDER BY numSignIns DESC;
+
+
+-- Table 9: Fall 2017 bio 1 roster students who signed in 1-4 times
 -- Same as above for students with 1-4 visits per semester
+SELECT bio1roster.First_Name, bio1roster.Last_Name, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
+FROM signins, bio1roster
+WHERE (signins.First_Name || " " || signins.Last_Name) = (bio1roster.First_Name || " " || bio1roster.Last_Name) AND signins.Semester = bio1roster.Semester AND bio1roster.Semester = "Fall 2017"
+GROUP BY (bio1roster.First_Name || " " || bio1roster.Last_Name)
+HAVING numSignIns <= 4
+ORDER BY numSignIns DESC;
+
+-- Table 10: Spring 2018 bio 1 roster students who signed in 1-4 times
+-- Same as above for students with 1-4 visits per semester
+SELECT bio1roster.First_Name, bio1roster.Last_Name, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
+FROM signins, bio1roster
+WHERE (signins.First_Name || " " || signins.Last_Name) = (bio1roster.First_Name || " " || bio1roster.Last_Name) AND signins.Semester = bio1roster.Semester AND bio1roster.Semester = "Spring 2018"
+GROUP BY (bio1roster.First_Name || " " || bio1roster.Last_Name)
+HAVING numSignIns <= 4
+ORDER BY numSignIns DESC;
+
+-- Table 11: Fall 2017 count of ALL bio 1 roster students who signed in
+SELECT bio1roster.First_Name, bio1roster.Last_Name, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
+FROM signins, bio1roster
+WHERE (signins.First_Name || " " || signins.Last_Name) = (bio1roster.First_Name || " " || bio1roster.Last_Name) AND signins.Semester = bio1roster.Semester AND bio1roster.Semester = "Fall 2017"
+GROUP BY (bio1roster.First_Name || " " || bio1roster.Last_Name)
+ORDER BY numSignIns DESC;
+
+-- Table 12: Spring 2018 count of ALL bio 1 roster students who signed in
+SELECT bio1roster.First_Name, bio1roster.Last_Name, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
+FROM signins, bio1roster
+WHERE (signins.First_Name || " " || signins.Last_Name) = (bio1roster.First_Name || " " || bio1roster.Last_Name) AND signins.Semester = bio1roster.Semester AND bio1roster.Semester = "Spring 2018"
+GROUP BY (bio1roster.First_Name || " " || bio1roster.Last_Name)
+ORDER BY numSignIns DESC;
+
+-- Table 13: Fall 2017 Duplicate names on survey
+-- Five students took the survey twice???
+SELECT name, COUNT(name) AS numOccurences 
+FROM bio1survey
+WHERE Semester = "Fall 2017"
+GROUP BY name
+HAVING numOccurences > 1
+ORDER BY numOccurences DESC;
+-- 5 students have the same name???
+
+-- Table 14: Spring 2018 Duplicate names on survey
+-- Seven students took the survey twice???
+SELECT name, COUNT(name) AS numOccurences 
+FROM bio1survey
+WHERE Semester = "Spring 2018"
+GROUP BY name
+HAVING numOccurences > 1
+ORDER BY numOccurences DESC;
+-- 5 students have the same name???
+
+-- Table 15: Fall 2017 Duplicate names on roster
+-- Same thing, but looking at duplicat names on roster (not survey)
+SELECT (First_Name || " " || Last_Name) AS name, COUNT(First_Name || " " || Last_Name) AS numOccurences 
+FROM bio1roster
+WHERE Semester = "Fall 2017"
+GROUP BY name
+HAVING numOccurences > 1
+ORDER BY numOccurences DESC;
+
+-- Table 16: Spring 2018 Duplicate names on roster
+-- Same thing, but looking at duplicat names on roster (not survey)
+SELECT (First_Name || " " || Last_Name) AS name, COUNT(First_Name || " " || Last_Name) AS numOccurences 
+FROM bio1roster
+WHERE Semester = "Spring 2018"
+GROUP BY name
+HAVING numOccurences > 1
+ORDER BY numOccurences DESC;
+
+
+-- Table 17: Fall 2017 Histogram count of signins
+-- This article was useful in making the histograms
+
+SELECT bio1roster.First_Name, bio1roster.Last_Name, bio1roster.Semester, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
+FROM bio1roster LEFT OUTER JOIN signins ON ( signins.First_Name = bio1roster.First_Name AND  signins.Last_Name = bio1roster.Last_Name AND signins.Semester = bio1roster.Semester )
+WHERE bio1roster.Semester = "Fall 2017"
+GROUP BY (bio1roster.First_Name || " " || bio1roster.Last_Name)
+ORDER BY numSignIns DESC;
+
+SELECT DISTINCT (bio1roster.First_Name || " " || bio1roster.Last_Name) AS name, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
+FROM bio1roster LEFT OUTER JOIN signins ON ( (signins.First_Name || " " || signins.Last_Name) = (bio1roster.First_Name || " " || bio1roster.Last_Name) AND signins.Semester = bio1roster.Semester AND bio1roster.Semester = "Fall 2017" )
+GROUP BY name
+ORDER BY numSignins DESC;
+
+SELECT COUNT(*)
+FROM bio1roster LEFT OUTER JOIN signins ON ( (signins.First_Name || " " || signins.Last_Name) = (bio1roster.First_Name || " " || bio1roster.Last_Name) AND signins.Semester = bio1roster.Semester AND bio1roster.Semester = "Fall 2017" );
+
+SELECT First_Name, Last_Name
+FROM bio1roster LEFT OUTER JOIN signins ON ( signins.First_Name = bio1roster.First_Name AND  signins.Last_Name = bio1roster.Last_Name AND signins.Semester = bio1roster.Semester AND bio1roster.Semester = "Fall 2017" );
+
+
+SELECT COUNT(bio1roster.First_Name || " " || bio1roster.Last_Name)
+FROM bio1roster
+WHERE Semester = "Fall 2017";
+
+SELECT COUNT(*)
+FROM signins;
+
+SELECT numSignIns, COUNT(*)
+FROM (
+    SELECT bio1roster.First_Name, bio1roster.Last_Name, COUNT(DISTINCT signins.Transaction_Date_Time) AS numSignIns
+    FROM signins, bio1roster
+    WHERE (signins.First_Name || " " || signins.Last_Name) = (bio1roster.First_Name || " " || bio1roster.Last_Name) AND signins.Semester = bio1roster.Semester AND bio1roster.Semester = "Fall 2017"
+    GROUP BY (bio1roster.First_Name || " " || bio1roster.Last_Name)
+    ORDER BY numSignIns DESC
+)
+GROUP BY numSignIns
+ORDER BY numSignIns ASC;
+
+SELECT *
+FROM bio1roster, signins
+WHERE (signins.First_Name || " " || signins.Last_Name) = (bio1roster.First_Name || " " || bio1roster.Last_Name) AND signins.Semester = bio1roster.Semester AND bio1roster.Semester = "Spring 2018";
+
+-- ***** Venn Diagram *****
+-- TODO: Make a Venn diagam indicating the overlap between the bio 1 roster, the bio1survey survey data, and the stem center signins. This will show how many students are in each group individually, and in both groups. Do this for both bio 1 semesters.
+
+
 
  
 
--- ***** For both semesters, or STEM Center in general *****
+-- ***** For both semesters, or STEM Center in general (no particular semester of bio 1) *****
 
 
 -- Find students who were in both semesters of bio 1:
@@ -227,7 +338,6 @@ ORDER BY Semester, Last_Name, First_Name;
 
 
 
--- TODO: Make a Venn diagam indicating the overlap between the bio 1 roster, the bio1survey survey data, and the stem center signins. This will show how many students are in each group individually, and in both groups. Do this for both bio 1 semesters.
 
 
 -- TODO: Finish report and email to Petia. After Petia reviews it and you make the corrections, schedule an in-person meeting with Petia. Then email it to Beaster-Jones.
