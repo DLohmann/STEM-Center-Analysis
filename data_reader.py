@@ -73,6 +73,14 @@ def read_file_as_df (file_name):
 	#print("Data's head is: ")
 	#print(df.head)
 	
+	# TODO: Fix bug where "Semester" field is set to "STEM Center Tutoring" for certain semesters from 2014-03-20 16:15:25 to 2015-03-18 15:16:43 and test for this using this query:
+	'''
+	SELECT Semester, COUNT(*), COUNT(DISTINCT Transaction_ID), MIN(Transaction_Date_Time) AS Start, MAX(Transaction_Date_Time) AS End
+	FROM signins
+	GROUP BY Semester
+	ORDER BY Start;
+	'''
+	
 	# TODO: Save as excel file to processed data folder
 	
 	# TODO: Delete index column, so that it will not be inserted into database later
@@ -81,7 +89,7 @@ def read_file_as_df (file_name):
 
 
 
-# ***** Create database *****
+# ***** Create database *****SELECT Semester, COUNT(*), MIN(Transaction_Date_Time) AS Start, MAX(Transaction_Date_Time) AS End, COUNT(DISTINCT Transaction_ID)  FROM signins GROUP BY Semester ORDER BY Start;
 
 # Delete the old database, if it exists
 #if (os.path.exists('STEM_Center.db')):
